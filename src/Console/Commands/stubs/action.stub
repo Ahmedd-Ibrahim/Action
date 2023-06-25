@@ -1,0 +1,13 @@
+<?php
+
+namespace App\Actions;
+
+use {{interfaceNameSpace}};
+
+class {{className}} implements {{interfaceName}}
+{
+    public function handle()
+    {
+        // Action logic here
+    }
+}

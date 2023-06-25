@@ -1,0 +1,8 @@
+<?php
+
+namespace {{interfaceNameSpace}};
+
+interface {{interfaceName}}
+{
+    public function handle();
+}

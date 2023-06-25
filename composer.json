@@ -1,0 +1,33 @@
+{
+    "name": "ahmedd-ibrahim/action",
+    "description": "Laravel Action",
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "AhmeddIbrahim\\Action\\": "src/"
+        },
+        "files": [
+            "src/Providers/ActionServiceProvider.php"
+        ]
+    },
+    "authors": [
+        {
+            "name": "Ahmedd-Ibrahim",
+            "email": "0ahmedibrahem@gmail.com"
+        }
+    ],
+    "require": {
+        "spatie/php-structure-discoverer": "^1.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "AhmeddIbrahim\\Action\\Providers\\ActionServiceProvider"
+            ],
+            "config": "AhmeddIbrahim\\Action\\config\\action.php",
+            "commands": [
+                "AhmeddIbrahim\\Action\\Console\\Commands"
+            ]
+        }
+    }
+}
