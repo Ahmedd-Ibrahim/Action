@@ -13,49 +13,86 @@ class MakeActionCommand extends Command
 
     public function handle()
     {
-        $name = $this->argument('name');
+        $name = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $this->argument('name'));
         $className = Str::studly($name) . 'Action';
         $interfaceName = Str::studly($name);
-        $configContractsPath = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, config('action.contracts_path', 'Actions\\Contracts\\'));
-        $configActionPath = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, config('action.actions_path', 'Actions\\'));
-        $interfaceNamespace = app()->getInstance()->getNamespace() . $configContractsPath . str_replace(['\\', '/'], '\\', $interfaceName);
+        $configContractsPath = $this->getContractsPath();
+        $configActionPath = $this->getActionsPath();
+        $interfaceNamespace = $this->getInterfaceNamespace($interfaceName);
+        $classNamespace = $this->getClassNamespace();
 
-        $classContent = file_get_contents(__DIR__ . '/stubs/action.stub');
-        $classStub = str_replace(
-            ['{{className}}', '{{interfaceName}}', '{{interfaceNameSpace}}'],
-            [basename($className), basename($interfaceName), $interfaceNamespace],
-            $classContent
-        );
-
-        $interfaceContent = file_get_contents(__DIR__ . '/stubs/interface.stub');
-        $interfaceStub = str_replace(
-            ['{{interfaceName}}', '{{interfaceNameSpace}}'],
-            [basename($interfaceName), dirname($interfaceNamespace)],
-            $interfaceContent
-        );
+        if (!is_null(basename($className))) {
+            $classNamespace = $classNamespace . basename($className);
+        }
 
         // Generate the directory paths for interface and class
-        $interfacePath = app_path($configContractsPath . str_replace(['\\', '/'], '\\', $name));
-        $classPath = app_path($configActionPath . str_replace('\\', '/', $name));
-        if (!file_exists(dirname($classPath))) {
-            mkdir(dirname($interfacePath), 0755, true);
-        }
+        $interfacePath = app_path($configContractsPath . DIRECTORY_SEPARATOR . $interfaceName . '.php');
+        $classPath = app_path($configActionPath . DIRECTORY_SEPARATOR . $className . '.php');
 
-        if (!file_exists(dirname($classPath))) {
-            mkdir(dirname($classPath), 0755, true);
-        }
-
-        $classPath = dirname($classPath) . '/' . basename($className) . '.php';
-        $interfacePath = dirname($interfacePath) . '/' . basename($interfaceName) . '.php';
+        $this->createDirectoryIfNotExists(dirname($interfacePath));
+        $this->createDirectoryIfNotExists(dirname($classPath));
 
         if (file_exists($classPath) || file_exists($interfacePath)) {
             $this->error('Action already exists!');
             return;
         }
 
-        file_put_contents($classPath, $classStub);
-        file_put_contents($interfacePath, $interfaceStub);
+        $classStub = file_get_contents(__DIR__ . '/stubs/action.stub');
+        $classContent = str_replace(
+            ['{{className}}', '{{interfaceName}}', '{{interfaceNameSpace}}', '{{classNamespace}}'],
+            [basename($className), basename($interfaceName), $interfaceNamespace, $classNamespace],
+            $classStub
+        );
+
+        $interfaceStub = file_get_contents(__DIR__ . '/stubs/interface.stub');
+        $interfaceContent = str_replace(
+            ['{{interfaceName}}', '{{interfaceNameSpace}}'],
+            [basename($interfaceName), dirname($interfaceNamespace)],
+            $interfaceStub
+        );
+
+        file_put_contents($classPath, $classContent);
+        file_put_contents($interfacePath, $interfaceContent);
 
         $this->info('Action created successfully: ' . $className);
+    }
+
+    private function getContractsPath()
+    {
+        $contractPath = config('action.contracts_path', 'Actions\\Contracts');
+
+        if (Str::endsWith($contractPath, '\\') || Str::endsWith($contractPath, '/')) {
+            $contractPath = substr($contractPath, 0, -1);
+        }
+
+        return str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $contractPath);
+    }
+
+    private function getActionsPath()
+    {
+        $contractPath = config('action.actions_path', 'Actions');
+
+        if (Str::endsWith($contractPath, '\\') || Str::endsWith($contractPath, '/')) {
+            $contractPath = substr($contractPath, 0, -1);
+        }
+
+        return str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $contractPath);
+    }
+
+    private function getInterfaceNamespace($interfaceName)
+    {
+        return app()->getInstance()->getNamespace() . $this->getContractsPath() . $interfaceName;
+    }
+
+    private function getClassNamespace()
+    {
+        return app()->getInstance()->getNamespace() . $this->getActionsPath();
+    }
+
+    private function createDirectoryIfNotExists($path)
+    {
+        if (!file_exists($path)) {
+            mkdir($path, 0755, true);
+        }
     }
 }

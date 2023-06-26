@@ -24,7 +24,7 @@ class ActionServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->publishes([
-            __DIR__ . '/config/action.php' => config_path('action.php'),
+            __DIR__ . '/../config/action.php' => config_path('action.php'),
         ], 'config');
 
         if ($this->app->runningInConsole()) {
