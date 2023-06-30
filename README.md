@@ -7,7 +7,7 @@ The Laravel Action package provides a convenient way to generate action classes 
 You can install the package via Composer by running the following command:
 
 ```bash
-composer require packageName
+composer require ahmedd-ibrahim/action
 ```
 
 ## Usage
