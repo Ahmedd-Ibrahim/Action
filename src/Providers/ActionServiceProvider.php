@@ -14,6 +14,8 @@ class ActionServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/action.php', 'action');
+
+        require_once(__DIR__ . '/../Helper.php');
     }
 
     /**
@@ -36,15 +38,15 @@ class ActionServiceProvider extends ServiceProvider
 
         StructureScoutManager::add(ActionsStructureScout::class);
 
-        $contractPrefix = 'App\\Actions\\Contracts';
-        $actionPrefix = 'App\\Actions';
-        $actionSuffix = 'Action';
+        $contract_prefix = contract_prefix();
+        $action_prefix =  action_prefix();
+        $action_suffix = action_suffix();
 
         $contracts = ActionsStructureScout::create()->get();
 
         foreach ($contracts as $contract) {
-            if (str_starts_with($contract, $contractPrefix)) {
-                $action = $actionPrefix . explode('Contracts', $contract)[1] . $actionSuffix;
+            if (str_starts_with($contract, $contract_prefix)) {
+                $action = $action_prefix . explode('Contracts', $contract)[1] . $action_suffix;
 
                 $this->app->bind($contract, $this->customBindings[$contract] ?? $action);
             }

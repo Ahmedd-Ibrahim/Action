@@ -7,7 +7,8 @@
             "AhmeddIbrahim\\Action\\": "src/"
         },
         "files": [
-            "src/Providers/ActionServiceProvider.php"
+            "src/Providers/ActionServiceProvider.php",
+            "src/Helper.php"
         ]
     },
     "authors": [
