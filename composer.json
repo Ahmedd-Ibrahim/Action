@@ -30,5 +30,6 @@
                 "AhmeddIbrahim\\Action\\Console\\Commands"
             ]
         }
-    }
+    },
+    "license": "MIT"
 }
