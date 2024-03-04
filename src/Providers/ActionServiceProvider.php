@@ -3,9 +3,9 @@
 namespace AhmeddIbrahim\Action\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Support\StructureScouts\ActionsStructureScout;
 use AhmeddIbrahim\Action\Console\Commands\MakeActionCommand;
 use Spatie\StructureDiscoverer\Support\StructureScoutManager;
+use AhmeddIbrahim\Action\StructureScouts\ActionsStructureScout;
 
 class ActionServiceProvider extends ServiceProvider
 {
