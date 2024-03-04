@@ -13,20 +13,18 @@ class MakeActionCommand extends Command
 
     public function handle()
     {
-        $name = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, $this->argument('name'));
+        $this->createAction();
+    }
+
+    protected function createAction()
+    {
+        $name = $this->argument('name');
         $className = Str::studly($name) . 'Action';
         $interfaceName = Str::studly(basename($name));
-        $interfaceNameWithPrefix = Str::studly($name);
-        $interfaceWithNamespace = contract_prefix(). DIRECTORY_SEPARATOR . $interfaceNameWithPrefix;
-        $classNamespace = action_prefix();
+        $interfaceWithNamespace = contract_prefix() . DIRECTORY_SEPARATOR . Str::studly($name);
+        $classNamespace = action_prefix() . DIRECTORY_SEPARATOR . get_namespace_from_class_name($className);
 
-        // if giving class name has prefix handle it
-        if (!is_null(get_namespace_from_class_name($className))) {
-            $classNamespace = $classNamespace . DIRECTORY_SEPARATOR . get_namespace_from_class_name($className);
-        }
-
-        // Generate the directory paths for interface and class
-        $interfacePath = app_path(get_contracts_path() . DIRECTORY_SEPARATOR . $interfaceNameWithPrefix . '.php');
+        $interfacePath = app_path(get_contracts_path() . DIRECTORY_SEPARATOR . basename($interfaceWithNamespace) . '.php');
         $classPath = app_path(get_actions_path() . DIRECTORY_SEPARATOR . $className . '.php');
 
         $this->createDirectoryIfNotExists(dirname($interfacePath));
@@ -37,24 +35,33 @@ class MakeActionCommand extends Command
             return;
         }
 
-        $classStub = file_get_contents(__DIR__ . '/stubs/action.stub');
-        $classContent = str_replace(
-            ['{{className}}', '{{interfaceName}}', '{{interfaceNameSpace}}', '{{classNamespace}}'],
-            [basename($className), basename($interfaceName), $interfaceWithNamespace, $classNamespace],
-            $classStub
-        );
-
-        $interfaceStub = file_get_contents(__DIR__ . '/stubs/interface.stub');
-        $interfaceContent = str_replace(
-            ['{{interfaceName}}', '{{interfaceNameSpace}}'],
-            [basename($interfaceName), dirname($interfaceWithNamespace)],
-            $interfaceStub
-        );
+        $classContent = $this->generateClassContent($className, $interfaceName, $interfaceWithNamespace, $classNamespace);
+        $interfaceContent = $this->generateInterfaceContent($interfaceName, $interfaceWithNamespace);
 
         file_put_contents($classPath, $classContent);
         file_put_contents($interfacePath, $interfaceContent);
 
         $this->info('Action created successfully: ' . $className);
+    }
+
+    private function generateClassContent($className, $interfaceName, $interfaceWithNamespace, $classNamespace)
+    {
+        $classStub = file_get_contents(__DIR__ . '/stubs/action.stub');
+        return str_replace(
+            ['{{className}}', '{{interfaceName}}', '{{interfaceNameSpace}}', '{{classNamespace}}'],
+            [$className, $interfaceName, $interfaceWithNamespace, $classNamespace],
+            $classStub
+        );
+    }
+
+    private function generateInterfaceContent($interfaceName, $interfaceWithNamespace)
+    {
+        $interfaceStub = file_get_contents(__DIR__ . '/stubs/interface.stub');
+        return str_replace(
+            ['{{interfaceName}}', '{{interfaceNameSpace}}'],
+            [$interfaceName, $interfaceWithNamespace],
+            $interfaceStub
+        );
     }
 
     private function createDirectoryIfNotExists($path)
