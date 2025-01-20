@@ -18,7 +18,7 @@
         }
     ],
     "require": {
-        "spatie/php-structure-discoverer": "^1.0 || ^2.*"
+        "spatie/php-structure-discoverer": "^1.0 || ^2.1"
     },
     "extra": {
         "laravel": {
