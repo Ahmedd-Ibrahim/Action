@@ -49,7 +49,5 @@ if (!function_exists('get_namespace_from_class_name')) {
         if ($lastBackslashPos !== false) {
             return substr($className, 0, $lastBackslashPos);
         }
-
-        return '';
     }
 }

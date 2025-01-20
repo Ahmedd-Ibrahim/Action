@@ -3,9 +3,9 @@
 namespace AhmeddIbrahim\Action\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Support\StructureScouts\ActionsStructureScout;
 use AhmeddIbrahim\Action\Console\Commands\MakeActionCommand;
 use Spatie\StructureDiscoverer\Support\StructureScoutManager;
+use AhmeddIbrahim\Action\StructureScouts\ActionsStructureScout;
 
 class ActionServiceProvider extends ServiceProvider
 {
@@ -38,15 +38,11 @@ class ActionServiceProvider extends ServiceProvider
 
         StructureScoutManager::add(ActionsStructureScout::class);
 
-        $contract_prefix = contract_prefix();
-        $action_prefix =  action_prefix();
-        $action_suffix = action_suffix();
-
         $contracts = ActionsStructureScout::create()->get();
 
         foreach ($contracts as $contract) {
-            if (str_starts_with($contract, $contract_prefix)) {
-                $action = $action_prefix . explode('Contracts', $contract)[1] . $action_suffix;
+            if (str_starts_with($contract, contract_prefix())) {
+                $action = 'App' . explode('Contracts', $contract)[1] . action_suffix();
 
                 $this->app->bind($contract, $this->customBindings[$contract] ?? $action);
             }
