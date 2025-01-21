@@ -16,7 +16,7 @@ class ActionsStructureScout extends StructureScout
 
     protected function definition(): Discover
     {
-        $actionDirectory = config('action.actions_suffix', 'Actions');
+        $actionDirectory = config('action.actions_path', 'Actions');
         is_dir(app_path($actionDirectory)) || mkdir(app_path($actionDirectory));
         return Discover::in(app_path($actionDirectory))
             ->interfaces();

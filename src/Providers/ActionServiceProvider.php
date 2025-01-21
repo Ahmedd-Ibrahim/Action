@@ -42,7 +42,7 @@ class ActionServiceProvider extends ServiceProvider
 
         foreach ($contracts as $contract) {
             if (str_starts_with($contract, contract_prefix())) {
-                $action = 'App' . explode('Contracts', $contract)[1] . action_suffix();
+                $action = 'App\\Actions' . explode('Contracts', $contract, 2)[1] . action_suffix();
 
                 $this->app->bind($contract, $this->customBindings[$contract] ?? $action);
             }
